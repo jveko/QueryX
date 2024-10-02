@@ -1,32 +1,36 @@
 ﻿using System.Linq;
 using System;
+using System.Linq.Expressions;
 using QueryX.Utils;
 
 namespace QueryX
 {
     internal interface ICustomFilter
     {
-
     }
 
     internal interface ICustomFilter<TModel> : ICustomFilter
     {
-        IQueryable<TModel> Apply(IQueryable<TModel> source, string?[] values, FilterOperator @operator);
+        Expression Apply(ParameterExpression parameters, string?[] values, FilterOperator @operator);
     }
 
     internal class CustomFilter<TModel, TValue> : ICustomFilter<TModel>
     {
-        private readonly Func<IQueryable<TModel>, TValue[], FilterOperator, IQueryable<TModel>> _customFilterDelegate;
+        private readonly Func<ParameterExpression, TValue[], FilterOperator, Expression>
+            _customFilterDelegate;
 
-        internal CustomFilter(Func<IQueryable<TModel>, TValue[], FilterOperator, IQueryable<TModel>> customFilterDeleagate)
+        internal CustomFilter(
+            Func<ParameterExpression, TValue[], FilterOperator, Expression>
+                customFilterDeleagate)
         {
             _customFilterDelegate = customFilterDeleagate;
         }
 
-        IQueryable<TModel> ICustomFilter<TModel>.Apply(IQueryable<TModel> source, string?[] values, FilterOperator @operatpr)
+        Expression ICustomFilter<TModel>.Apply(ParameterExpression parameters, string?[] values,
+            FilterOperator @operator)
         {
             var typedValues = values.Select(v => v.ConvertValue(typeof(TValue))).Cast<TValue>().ToArray();
-            return _customFilterDelegate(source, typedValues, @operatpr);
+            return _customFilterDelegate(parameters, typedValues, @operator);
         }
     }
 }

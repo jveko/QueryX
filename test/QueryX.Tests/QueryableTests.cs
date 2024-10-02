@@ -576,7 +576,8 @@ namespace QueryX.Tests
         public void ContainsCaseInSensitiveTest()
         {
             const string ProductNameContains = "RoD";
-            Expression<Func<Product, bool>> expectedFilter = x => x.Name.ToLower().Contains(ProductNameContains.ToLower());
+            Expression<Func<Product, bool>> expectedFilter =
+                x => x.Name.ToLower().Contains(ProductNameContains.ToLower());
             var query = new QueryModel
             {
                 Filter = $"name -=-* '{ProductNameContains}'"
@@ -610,7 +611,8 @@ namespace QueryX.Tests
         public void StartsWithCaseInsensitiveTest()
         {
             const string ProductNameStartWith = "PrOD";
-            Expression<Func<Product, bool>> expectedFilter = x => x.Name.ToLower().StartsWith(ProductNameStartWith.ToLower());
+            Expression<Func<Product, bool>> expectedFilter =
+                x => x.Name.ToLower().StartsWith(ProductNameStartWith.ToLower());
             var query = new QueryModel
             {
                 Filter = $"name =-* '{ProductNameStartWith}'"
@@ -644,7 +646,8 @@ namespace QueryX.Tests
         public void EndsWithCaseInsensitiveTest()
         {
             const string ProductNameEndsWith = "DUcT1";
-            Expression<Func<Product, bool>> expectedFilter = x => x.Name.ToLower().EndsWith(ProductNameEndsWith.ToLower());
+            Expression<Func<Product, bool>> expectedFilter =
+                x => x.Name.ToLower().EndsWith(ProductNameEndsWith.ToLower());
             var query = new QueryModel
             {
                 Filter = $"name -=* '{ProductNameEndsWith}'"

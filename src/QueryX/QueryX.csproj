@@ -5,13 +5,13 @@
         <Nullable>enable</Nullable>
         <LangVersion>8.0</LangVersion>
         <Copyright>Copyright © 2022 Hector Carballo</Copyright>
-        <PackageProjectUrl>https://github.com/hector-co/QueryX</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/jveko/QueryX</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-        <Authors>Hector Carballo</Authors>
+        <Authors>Jveko</Authors>
         <VersionSuffix></VersionSuffix>
         <Description>Query string queries</Description>
-        <RepositoryType>https://github.com/hector-co/QueryX</RepositoryType>
+        <RepositoryType>https://github.com/jveko/QueryX</RepositoryType>
         <PackageTags>query string url</PackageTags>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     </PropertyGroup>
@@ -28,13 +28,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
         <PackageReference Include="MinVer" Version="4.3.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Superpower" Version="3.0.0" />
+        <PackageReference Include="Superpower" Version="3.0.0"/>
     </ItemGroup>
 
 </Project>

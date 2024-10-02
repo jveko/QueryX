@@ -26,6 +26,7 @@
         public bool Active { get; set; }
         public int Type { get; set; }
         public int? Order { get; set; }
+        public string? CustomProperty { get; set; }
     }
 
     public class ShoppingCart

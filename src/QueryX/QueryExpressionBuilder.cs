@@ -6,19 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace QueryX
 {
     internal class QueryExpressionBuilder<TModel> : INodeVisitor
     {
-        internal static MethodInfo AnyMethod => typeof(Enumerable).GetMethods().First(m => m.Name == "Any" && m.GetParameters().Count() == 2);
-        internal static MethodInfo AllMethod => typeof(Enumerable).GetMethods().First(m => m.Name == "All" && m.GetParameters().Count() == 2);
+        internal static MethodInfo AnyMethod => typeof(Enumerable).GetMethods()
+            .First(m => m.Name == "Any" && m.GetParameters().Count() == 2);
+
+        internal static MethodInfo AllMethod => typeof(Enumerable).GetMethods()
+            .First(m => m.Name == "All" && m.GetParameters().Count() == 2);
 
         private readonly string? _filter;
         private readonly Stack<Context> _contexts;
         private readonly QueryMappingConfig _mappingConfig;
 
-        private readonly Dictionary<string, (string?[] Values, FilterOperator Operator)> _customFilters = new Dictionary<string, (string?[], FilterOperator)>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, (string?[] Values, FilterOperator Operator)> _customFilters =
+            new Dictionary<string, (string?[], FilterOperator)>(StringComparer.OrdinalIgnoreCase);
 
         public QueryExpressionBuilder(string? filter, QueryMappingConfig mappingConfig)
         {
@@ -49,7 +54,9 @@ namespace QueryX
                 null when right == null => null,
                 null => node.IsNegated ? Expression.Not(right) : right,
                 _ when right == null => node.IsNegated ? Expression.Not(left) : left,
-                _ => node.IsNegated ? (Expression)Expression.Not(Expression.OrElse(left, right)) : Expression.OrElse(left, right)
+                _ => node.IsNegated
+                    ? (Expression)Expression.Not(Expression.OrElse(left, right))
+                    : Expression.OrElse(left, right)
             };
 
             context.Stack.Push(exp);
@@ -70,7 +77,9 @@ namespace QueryX
                 null when right == null => null,
                 null => node.IsNegated ? Expression.Not(right) : right,
                 _ when right == null => node.IsNegated ? Expression.Not(left) : left,
-                _ => node.IsNegated ? (Expression)Expression.Not(Expression.AndAlso(left, right)) : Expression.AndAlso(left, right)
+                _ => node.IsNegated
+                    ? (Expression)Expression.Not(Expression.AndAlso(left, right))
+                    : Expression.AndAlso(left, right)
             };
 
             context.Stack.Push(exp);
@@ -99,15 +108,16 @@ namespace QueryX
 
             if (modelMapping.HasCustomFilter(resolvedName))
             {
-                if (!_customFilters.ContainsKey(resolvedName))
-                    _customFilters.Add(resolvedName, (node.Values, node.Operator));
-
-                context.Stack.Push(null);
+                var mapping = _mappingConfig?.GetMapping(typeof(TModel)) ??
+                              QueryMappingConfig.Global.GetMapping(typeof(TModel));
+                var expression =
+                    mapping.ApplyCustomFilters<TModel>(context.Parameter, resolvedName, node.Values, node.Operator);
+                context.Stack.Push(expression);
                 return;
             }
 
             var propExp = resolvedName.GetPropertyExpression(context.Parameter)
-                ?? throw new InvalidFilterPropertyException(node.Property);
+                          ?? throw new InvalidFilterPropertyException(node.Property);
 
             context.Stack.Push(node.GetExpression(propExp, modelMapping));
         }
@@ -132,9 +142,9 @@ namespace QueryX
             }
 
             var propertyInfo = resolvedName.GetPropertyInfo<TModel>()
-                ?? throw new InvalidFilterPropertyException(resolvedName);
-
-            if (propertyInfo.PropertyType.GetGenericArguments().Count() == 0)
+                               ?? throw new InvalidFilterPropertyException(resolvedName);
+            var genericTargetTypee = propertyInfo.PropertyType.GetGenericArguments();
+            if (!propertyInfo.PropertyType.GetGenericArguments().Any())
                 throw new InvalidFilterPropertyException(resolvedName);
 
             var genericTargetType = propertyInfo.PropertyType.GetGenericArguments()[0];
@@ -152,13 +162,14 @@ namespace QueryX
                 _contexts.Pop();
                 return;
             }
+
             var exp = Expression.Lambda(lastExp, modelParameter);
 
             var method = node.ApplyAll ? AllMethod : AnyMethod;
             var methodGeneric = method.MakeGenericMethod(genericTargetType);
 
             var propExp = resolvedName.GetPropertyExpression(context.Parameter)
-                ?? throw new InvalidFilterPropertyException(resolvedName);
+                          ?? throw new InvalidFilterPropertyException(resolvedName);
             Expression anyExp = Expression.Call(null, methodGeneric, propExp, exp);
 
             if (node.IsNegated)
@@ -176,23 +187,11 @@ namespace QueryX
                 return null;
 
             var exp = context.Stack.Pop();
-            if (exp == null)
-                return null;
-
-            return Expression.Lambda<Func<TModel, bool>>(exp!, context.Parameter);
+            return exp == null ? null : Expression.Lambda<Func<TModel, bool>>(exp!, context.Parameter);
         }
 
         public IQueryable<TModel> ApplyCustomFilters(IQueryable<TModel> source)
         {
-            if (_customFilters.Count == 0)
-                return source;
-
-            var mapping = _mappingConfig?.GetMapping(typeof(TModel)) ?? QueryMappingConfig.Global.GetMapping(typeof(TModel));
-
-            foreach (var propertyName in _customFilters.Keys)
-            {
-                source = mapping.ApplyCustomFilters(source, propertyName, _customFilters[propertyName].Values, _customFilters[propertyName].Operator);
-            }
             return source;
         }
 

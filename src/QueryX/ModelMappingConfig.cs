@@ -9,7 +9,10 @@ namespace QueryX
     {
         private static readonly QueryMappingConfig _instance = new QueryMappingConfig();
         private static readonly ModelMapping _defaultMapping = new ModelMapping();
-        private readonly ConcurrentDictionary<Type, ModelMapping> _mappings = new ConcurrentDictionary<Type, ModelMapping>();
+
+        private readonly ConcurrentDictionary<Type, ModelMapping> _mappings =
+            new ConcurrentDictionary<Type, ModelMapping>();
+
         private readonly QueryConfiguration _queryConfig = new QueryConfiguration();
 
         public static QueryMappingConfig Global => _instance;
@@ -60,8 +63,8 @@ namespace QueryX
 
         internal ModelMapping GetMapping(Type modelType) =>
             _mappings.TryGetValue(modelType, out var mapping)
-                    ? mapping
-                    : _defaultMapping;
+                ? mapping
+                : _defaultMapping;
     }
 
     public class ModelMappingConfig<TModel>
@@ -107,13 +110,15 @@ namespace QueryX
             return this;
         }
 
-        public PropertyMappingConfig<TModel, TValue> CustomFilter(Func<IQueryable<TModel>, TValue[], FilterOperator, IQueryable<TModel>> filter)
+        public PropertyMappingConfig<TModel, TValue> CustomFilter(
+            Func<ParameterExpression, TValue[], FilterOperator, Expression> filter)
         {
-            _mapping.AddCustomFilter(_propertyName, filter);
+            _mapping.AddCustomFilter<TModel, TValue>(_propertyName, filter);
             return this;
         }
 
-        public PropertyMappingConfig<TModel, TValue> CustomSort(Func<IOrderedQueryable<TModel>, bool, bool, IQueryable<TModel>> sort)
+        public PropertyMappingConfig<TModel, TValue> CustomSort(
+            Func<IOrderedQueryable<TModel>, bool, bool, IQueryable<TModel>> sort)
         {
             _mapping.AddCustomSort(_propertyName, sort);
             return this;
