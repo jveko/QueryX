@@ -11,9 +11,9 @@ namespace QueryX.Utils
 {
     internal static class ExpressionHelper
     {
-        private static MethodInfo CastMethod => typeof(Enumerable).GetMethod("Cast");
-        private static MethodInfo ToListMethod => typeof(Enumerable).GetMethod("ToList");
-        private static MethodInfo ToLower => typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+        private static MethodInfo CastMethod => typeof(Enumerable).GetMethod("Cast")!;
+        private static MethodInfo ToListMethod => typeof(Enumerable).GetMethod("ToList")!;
+        private static MethodInfo ToLower => typeof(string).GetMethod("ToLower", Type.EmptyTypes)!;
 
         internal static Expression? GetPropertyExpression(this string propertyName, Expression modelParameter)
         {
@@ -31,9 +31,10 @@ namespace QueryX.Utils
             return property;
         }
 
-        internal static (Expression property, Expression values) GetPropertyAndConstant<TValue>(this Expression property, IEnumerable<TValue> value, bool isCaseInsensitive, bool allValues = false)
+        internal static (Expression property, Expression values) GetPropertyAndConstant<TValue>(
+            this Expression property, IEnumerable<TValue> value, bool isCaseInsensitive, bool allValues = false)
         {
-            var propInfo = (PropertyInfo)((MemberExpression)property).Member;
+            var propInfo = (PropertyInfo) ((MemberExpression) property).Member;
 
             var prop = isCaseInsensitive
                 ? Expression.Call(property, ToLower)
@@ -44,10 +45,9 @@ namespace QueryX.Utils
                 prop = Expression.Convert(prop, typeof(int));
             }
 
-            if (allValues)
-                return (prop, value.GetAllValueExpression(propInfo.PropertyType, !isCaseInsensitive));
-            else
-                return (prop, value.First().GetValueExpression(propInfo.PropertyType, !isCaseInsensitive));
+            return allValues
+                ? (prop, value.GetAllValueExpression(propInfo.PropertyType, !isCaseInsensitive))
+                : (prop, value.First().GetValueExpression(propInfo.PropertyType, !isCaseInsensitive));
         }
 
         private static Expression GetValueExpression<TValue>(this TValue value, Type targetType, bool isCaseSensitive)
@@ -70,7 +70,8 @@ namespace QueryX.Utils
             return constantExp;
         }
 
-        private static Expression GetAllValueExpression<TValue>(this IEnumerable<TValue> values, Type targetType, bool isCaseSensitive)
+        private static Expression GetAllValueExpression<TValue>(this IEnumerable<TValue> values, Type targetType,
+            bool isCaseSensitive)
         {
             if (targetType == typeof(string))
             {
@@ -79,11 +80,14 @@ namespace QueryX.Utils
 
                 return isCaseSensitive
                     ? Expression.Constant(values.Cast<string>().ToList())
-                    : Expression.Constant(values.Select(v => v == null ? v as string : (v as string)?.ToLower()).Cast<string>().ToList());
+                    : Expression.Constant(values.Select(v => v == null ? v as string : (v as string)?.ToLower())
+                        .Cast<string>().ToList());
             }
 
-            var converted = (IEnumerable)CastMethod.MakeGenericMethod(targetType).Invoke(null, new object[] { values.ToList() })!;
-            converted = (IEnumerable)ToListMethod.MakeGenericMethod(targetType).Invoke(null, new object[] { converted })!;
+            var converted = (IEnumerable) CastMethod.MakeGenericMethod(targetType)
+                .Invoke(null, new object[] {values.ToList()})!;
+            converted = (IEnumerable) ToListMethod.MakeGenericMethod(targetType)
+                .Invoke(null, new object[] {converted})!;
 
             return Expression.Constant(converted);
         }
@@ -98,9 +102,9 @@ namespace QueryX.Utils
             {
                 try
                 {
-                    var enumValue = Enum.Parse(targetType, (string)value, true);
+                    var enumValue = Enum.Parse(targetType, (string) value, true);
 
-                    return (int)enumValue;
+                    return (int) enumValue;
                 }
                 catch
                 {

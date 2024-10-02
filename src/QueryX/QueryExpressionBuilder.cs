@@ -6,16 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace QueryX
 {
     internal class QueryExpressionBuilder<TModel> : INodeVisitor
     {
-        internal static MethodInfo AnyMethod => typeof(Enumerable).GetMethods()
+        private static MethodInfo AnyMethod => typeof(Enumerable).GetMethods()
             .First(m => m.Name == "Any" && m.GetParameters().Count() == 2);
 
-        internal static MethodInfo AllMethod => typeof(Enumerable).GetMethods()
+        private static MethodInfo AllMethod => typeof(Enumerable).GetMethods()
             .First(m => m.Name == "All" && m.GetParameters().Count() == 2);
 
         private readonly string? _filter;
@@ -31,12 +30,9 @@ namespace QueryX
             _contexts = new Stack<Context>();
             _mappingConfig = mappingConfig;
             _contexts.Push(new Context(typeof(TModel), string.Empty, Expression.Parameter(typeof(TModel), "m")));
-
-            if (!string.IsNullOrEmpty(_filter))
-            {
-                var nodes = Parsing.QueryParser.ParseNodes(_filter);
-                Visit(nodes as dynamic);
-            }
+            if (_filter == null || string.IsNullOrEmpty(_filter)) return;
+            var nodes = Parsing.QueryParser.ParseNodes(_filter);
+            Visit(nodes as dynamic);
         }
 
         public void Visit(OrElseNode node)
@@ -55,7 +51,7 @@ namespace QueryX
                 null => node.IsNegated ? Expression.Not(right) : right,
                 _ when right == null => node.IsNegated ? Expression.Not(left) : left,
                 _ => node.IsNegated
-                    ? (Expression)Expression.Not(Expression.OrElse(left, right))
+                    ? (Expression) Expression.Not(Expression.OrElse(left, right))
                     : Expression.OrElse(left, right)
             };
 
@@ -78,7 +74,7 @@ namespace QueryX
                 null => node.IsNegated ? Expression.Not(right) : right,
                 _ when right == null => node.IsNegated ? Expression.Not(left) : left,
                 _ => node.IsNegated
-                    ? (Expression)Expression.Not(Expression.AndAlso(left, right))
+                    ? (Expression) Expression.Not(Expression.AndAlso(left, right))
                     : Expression.AndAlso(left, right)
             };
 
@@ -108,16 +104,15 @@ namespace QueryX
 
             if (modelMapping.HasCustomFilter(resolvedName))
             {
-                var mapping = _mappingConfig?.GetMapping(typeof(TModel)) ??
-                              QueryMappingConfig.Global.GetMapping(typeof(TModel));
+                var mapping = _mappingConfig.GetMapping(typeof(TModel));
                 var expression =
                     mapping.ApplyCustomFilters<TModel>(context.Parameter, resolvedName, node.Values, node.Operator);
                 context.Stack.Push(expression);
                 return;
             }
 
-            var propExp = resolvedName.GetPropertyExpression(context.Parameter)
-                          ?? throw new InvalidFilterPropertyException(node.Property);
+            var propExp = resolvedName.GetPropertyExpression(context.Parameter) ??
+                          throw new InvalidFilterPropertyException(node.Property);
 
             context.Stack.Push(node.GetExpression(propExp, modelMapping));
         }

@@ -11,9 +11,9 @@ namespace QueryX
 {
     internal static class FilterNodeExtensions
     {
-        private static MethodInfo Contains => typeof(string).GetMethod("Contains", new[] { typeof(string) });
-        private static MethodInfo EndsWith => typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
-        private static MethodInfo StartsWith => typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
+        private static MethodInfo Contains => typeof(string).GetMethod("Contains", new[] {typeof(string)})!;
+        private static MethodInfo EndsWith => typeof(string).GetMethod("EndsWith", new[] {typeof(string)})!;
+        private static MethodInfo StartsWith => typeof(string).GetMethod("StartsWith", new[] {typeof(string)})!;
         private static Dictionary<Type, MethodInfo> ListContains => new Dictionary<Type, MethodInfo>();
 
         private static MethodInfo GetListContains(this Type type)
@@ -27,9 +27,10 @@ namespace QueryX
             return methodInfo!;
         }
 
-        internal static Expression GetExpression(this FilterNode filterNode, Expression property, ModelMapping modelMapping)
+        internal static Expression GetExpression(this FilterNode filterNode, Expression property,
+            ModelMapping modelMapping)
         {
-            var propInfo = (PropertyInfo)((MemberExpression)property).Member;
+            var propInfo = (PropertyInfo) ((MemberExpression) property).Member;
             var propMapping = modelMapping.GetPropertyMapping(propInfo.Name);
 
             var values = propMapping.Convert != null
@@ -48,11 +49,13 @@ namespace QueryX
                 FilterOperator.LessThanOrEqual => GetLessThanOrEqualExpression(filterNode, property, values),
                 FilterOperator.NotEqual => GetNotEqualsExpression(filterNode, property, values),
                 FilterOperator.StartsWith => GetStartsWithExpression(filterNode, property, values),
+                FilterOperator.None => throw new QueryException("Invalid operator type: 'None'"),
                 _ => throw new QueryException($"Invalid operator type: '{filterNode.Operator}'"),
             };
         }
 
-        private static Expression GetContainsExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetContainsExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -64,7 +67,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetEndsWithExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetEndsWithExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -76,7 +80,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetEqualsExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetEqualsExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -88,7 +93,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetNotEqualsExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetNotEqualsExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -100,7 +106,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetGreaterThanExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetGreaterThanExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -112,7 +119,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetGreaterThanOrEqualExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetGreaterThanOrEqualExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -124,11 +132,13 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetInExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetInExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
-            var propType = ((PropertyInfo)((MemberExpression)property).Member).PropertyType;
+            var propType = ((PropertyInfo) ((MemberExpression) property).Member).PropertyType;
 
-            var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive, allValues: true);
+            var (prop, expValue) =
+                property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive, allValues: true);
 
             var exp = Expression.Call(expValue, propType.GetListContains(), prop);
 
@@ -138,7 +148,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetLessThanExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetLessThanExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -150,7 +161,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetLessThanOrEqualExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetLessThanOrEqualExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 
@@ -162,7 +174,8 @@ namespace QueryX
             return exp;
         }
 
-        private static Expression GetStartsWithExpression<TValue>(FilterNode filterNode, Expression property, IEnumerable<TValue> values)
+        private static Expression GetStartsWithExpression<TValue>(FilterNode filterNode, Expression property,
+            IEnumerable<TValue> values)
         {
             var (prop, expValue) = property.GetPropertyAndConstant(values, filterNode.IsCaseInsensitive);
 

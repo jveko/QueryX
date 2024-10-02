@@ -94,7 +94,10 @@ namespace QueryX.Tests
         public void IgnoreProperty()
         {
             var config = new QueryMappingConfig();
-            config.For<Product>(cfg => { cfg.Property(p => p.Price).IgnoreFilter(); });
+            config.For<Product>(cfg =>
+            {
+                cfg.Property(p => p.Price).IgnoreFilter();
+            });
 
             const float PriceFrom = 50;
             Expression<Func<Product, bool>> expectedFilter = x => true;
@@ -114,7 +117,10 @@ namespace QueryX.Tests
         public void IgnoreMappedProperty()
         {
             var config = new QueryMappingConfig();
-            config.For<Product>(cfg => { cfg.Property(p => p.Price).MapFrom("customPrice").IgnoreFilter(); });
+            config.For<Product>(cfg =>
+            {
+                cfg.Property(p => p.Price).MapFrom("customPrice").IgnoreFilter();
+            });
 
             const float PriceFrom = 50;
             Expression<Func<Product, bool>> expectedFilter = x => true;
@@ -134,7 +140,10 @@ namespace QueryX.Tests
         public void IgnoringNestedProperty()
         {
             var config = new QueryMappingConfig();
-            config.For<Product>(cfg => { cfg.Property(p => p.Price).IgnoreFilter(); });
+            config.For<Product>(cfg =>
+            {
+                cfg.Property(p => p.Price).IgnoreFilter();
+            });
 
             const float PriceFrom = 50;
             Expression<Func<Product, bool>> expectedFilter = x => true;
@@ -154,7 +163,10 @@ namespace QueryX.Tests
         public void MappingCollectionName()
         {
             var config = new QueryMappingConfig();
-            config.For<ShoppingCart>(cfg => { cfg.Property(s => s.Lines).MapFrom("detail"); });
+            config.For<ShoppingCart>(cfg =>
+            {
+                cfg.Property(s => s.Lines).MapFrom("detail");
+            });
 
             const float QuantityFrom = 35;
             Expression<Func<ShoppingCart, bool>> expectedFilter = x => x.Lines.Any(l => l.Quantity > QuantityFrom);
@@ -174,7 +186,10 @@ namespace QueryX.Tests
         public void MappingPropertyInsideCollection()
         {
             var config = new QueryMappingConfig();
-            config.For<ShoppingCartLine>(cfg => { cfg.Property(l => l.Quantity).MapFrom("quant"); });
+            config.For<ShoppingCartLine>(cfg =>
+            {
+                cfg.Property(l => l.Quantity).MapFrom("quant");
+            });
 
             const float QuantityFrom = 35;
             Expression<Func<ShoppingCart, bool>> expectedFilter = x => x.Lines.Any(l => l.Quantity > QuantityFrom);
@@ -194,7 +209,10 @@ namespace QueryX.Tests
         public void MappingNestedPropoertyInCollection()
         {
             var config = new QueryMappingConfig();
-            config.For<ShoppingCartLine>(cfg => { cfg.Property(l => l.Product).MapFrom("prod"); });
+            config.For<ShoppingCartLine>(cfg =>
+            {
+                cfg.Property(l => l.Product).MapFrom("prod");
+            });
 
             const float PriceFrom = 50;
             Expression<Func<ShoppingCart, bool>> expectedFilter = x => x.Lines.Any(l => l.Product.Price > PriceFrom);

@@ -10,19 +10,20 @@ namespace QueryX.Parsing
 {
     internal static class QueryParser
     {
-        private static readonly Dictionary<string, FilterOperator> _operatorToFilterOperator = new Dictionary<string, FilterOperator>
-        {
-            { "==", FilterOperator.Equal},
-            { "!=", FilterOperator.NotEqual},
-            { ">", FilterOperator.GreaterThan},
-            { ">=", FilterOperator.GreaterThanOrEqual},
-            { "<", FilterOperator.LessThan},
-            { "<=", FilterOperator.LessThanOrEqual},
-            { "|=", FilterOperator.In},
-            { "-=-", FilterOperator.Contains},
-            { "=-", FilterOperator.StartsWith},
-            { "-=", FilterOperator.EndsWith}
-        };
+        private static readonly Dictionary<string, FilterOperator> OperatorToFilterOperator =
+            new Dictionary<string, FilterOperator>
+            {
+                {"==", FilterOperator.Equal},
+                {"!=", FilterOperator.NotEqual},
+                {">", FilterOperator.GreaterThan},
+                {">=", FilterOperator.GreaterThanOrEqual},
+                {"<", FilterOperator.LessThan},
+                {"<=", FilterOperator.LessThanOrEqual},
+                {"|=", FilterOperator.In},
+                {"-=-", FilterOperator.Contains},
+                {"=-", FilterOperator.StartsWith},
+                {"-=", FilterOperator.EndsWith}
+            };
 
         private static TokenListParser<QueryToken, string> String { get; } =
             Token.EqualTo(QueryToken.String)
@@ -44,7 +45,7 @@ namespace QueryX.Parsing
 
         private static TokenListParser<QueryToken, string?> Null { get; } =
             Token.EqualToValueIgnoreCase(QueryToken.Identifier, "null")
-                .Value((string?)null);
+                .Value((string?) null);
 
         private static TokenListParser<QueryToken, QueryToken> And { get; } =
             Token.EqualTo(QueryToken.And).Value(QueryToken.And);
@@ -66,7 +67,7 @@ namespace QueryX.Parsing
 
         private static TokenListParser<QueryToken, FilterOperator> Operator { get; } =
             Token.EqualTo(QueryToken.Operator)
-                .Select(s => _operatorToFilterOperator[s.ToStringValue()]);
+                .Select(s => OperatorToFilterOperator[s.ToStringValue()]);
 
         private static TokenListParser<QueryToken, string> Property { get; } =
             Token.EqualTo(QueryToken.Identifier)
@@ -78,14 +79,14 @@ namespace QueryX.Parsing
             from op in Operator
             from ciFlag in Token.EqualTo(QueryToken.Asterisk).Value(true).OptionalOrDefault()
             from values in ValueArray
-            select (NodeBase)new FilterNode(property, op, values, isNegated: negation, isCaseInsensitive: ciFlag);
+            select (NodeBase) new FilterNode(property, op, values, isNegated: negation, isCaseInsensitive: ciFlag);
 
         private static TokenListParser<QueryToken, NodeBase> CollectionFilter { get; } =
             from negation in Token.EqualTo(QueryToken.Exclamation).Value(true).OptionalOrDefault()
             from property in Property
             from allFlag in Token.EqualTo(QueryToken.Asterisk).Value(true).OptionalOrDefault()
             from objectFilter in Group!
-            select (NodeBase)new CollectionFilterNode(property, objectFilter, applyAll: allFlag, isNegated: negation);
+            select (NodeBase) new CollectionFilterNode(property, objectFilter, applyAll: allFlag, isNegated: negation);
 
         private static TokenListParser<QueryToken, NodeBase> Group { get; } =
             from negation in Token.EqualTo(QueryToken.Exclamation).Value(true).OptionalOrDefault()

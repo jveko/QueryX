@@ -11,10 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{AB3AF74D-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryX.Tests", "test\QueryX.Tests\QueryX.Tests.csproj", "{E9C642A5-6F32-4422-9B28-2825FC3A8E7C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{FF57113C-0A5F-4B5F-B7BF-FB2F5E42F124}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryX.Samples.WebApi", "samples\QueryX.Samples.WebApi\QueryX.Samples.WebApi.csproj", "{CD529E57-814D-447D-9E45-17348138CB99}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +25,6 @@ Global
 		{E9C642A5-6F32-4422-9B28-2825FC3A8E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9C642A5-6F32-4422-9B28-2825FC3A8E7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9C642A5-6F32-4422-9B28-2825FC3A8E7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD529E57-814D-447D-9E45-17348138CB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD529E57-814D-447D-9E45-17348138CB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD529E57-814D-447D-9E45-17348138CB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD529E57-814D-447D-9E45-17348138CB99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -40,7 +32,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{CD5B30C5-0B3B-4999-A2D0-3C04B08FA0EC} = {F9D59AF0-B39A-462C-B2CF-3810B9861008}
 		{E9C642A5-6F32-4422-9B28-2825FC3A8E7C} = {AB3AF74D-F296-48B2-AC8B-E2F95458FBF4}
-		{CD529E57-814D-447D-9E45-17348138CB99} = {FF57113C-0A5F-4B5F-B7BF-FB2F5E42F124}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C889E44-3FCC-4EF9-8799-C56E810291E9}

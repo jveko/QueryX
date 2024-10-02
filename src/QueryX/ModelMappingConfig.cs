@@ -7,21 +7,16 @@ namespace QueryX
 {
     public class QueryMappingConfig
     {
-        private static readonly QueryMappingConfig _instance = new QueryMappingConfig();
-        private static readonly ModelMapping _defaultMapping = new ModelMapping();
+        private static readonly ModelMapping DefaultMapping = new ModelMapping();
 
         private readonly ConcurrentDictionary<Type, ModelMapping> _mappings =
             new ConcurrentDictionary<Type, ModelMapping>();
 
-        private readonly QueryConfiguration _queryConfig = new QueryConfiguration();
+        private readonly QueryConfiguration _queryConfig = Global == null ? new QueryConfiguration() : Global._queryConfig.Clone();
 
-        public static QueryMappingConfig Global => _instance;
+        public static QueryMappingConfig Global { get; } = new QueryMappingConfig();
+
         public QueryConfiguration QueryConfig => _queryConfig;
-
-        public QueryMappingConfig()
-        {
-            _queryConfig = _instance == null ? new QueryConfiguration() : _instance._queryConfig.Clone();
-        }
 
         public QueryMappingConfig For<TModel>(Action<ModelMappingConfig<TModel>> modelMappingConfig)
         {
@@ -64,7 +59,7 @@ namespace QueryX
         internal ModelMapping GetMapping(Type modelType) =>
             _mappings.TryGetValue(modelType, out var mapping)
                 ? mapping
-                : _defaultMapping;
+                : DefaultMapping;
     }
 
     public class ModelMappingConfig<TModel>
